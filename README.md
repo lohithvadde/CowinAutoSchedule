@@ -12,8 +12,13 @@ Once script finds the available slot, it will automatically download captcha in 
 Note: 
 
 *This script will only help you to book the slot using given District if slots are available. If slots are already full script will keep on running until it finds slots and book*
+
 *This Script will book appointment for next day by default. If you wish to change this behaviour you can edit DATE variable in config.py*
+
 *Script is tested for both 18-44 and 45+ group for first dose only*
+
 *You can also run this based on pincodes. Check bookkeeping folder for the api call. Makesure to not give more than 5 pincodes because of rate limitation*
+
 *If you want this for the second dose, change the dose value to 2*
-*Keep on feeding the Mobile OTP's whenever session expires. Don't worry ! This is easy, because you ll get an alert by system sounds"
+
+*Keep on feeding the Mobile OTP's whenever session expires. Don't worry ! This is easy, because you ll get an alert by system sounds*
