@@ -1,6 +1,7 @@
 import time
 
 from login import *
+from datetime import datetime
 
 def get_beneficiaries():
     beneficiaries = session.get('https://cdn-api.co-vin.in/api/v2/appointment/beneficiaries')
@@ -13,8 +14,8 @@ def get_beneficiaries():
 def book_slot(book):
     print(f"Trying to book: {book}")
     get_captcha()
-    book["captcha"] = input("Enter Captcha:")
     os.system(f'say -v "Victoria" "Enter Captcha"')
+    book["captcha"] = input("Enter Captcha:")
     book = json.dumps(book)
     resp = session.post("https://cdn-api.co-vin.in/api/v2/appointment/schedule", data=book)
     if resp.status_code == 200:
@@ -35,8 +36,12 @@ def get_captcha():
 
 
 def book_appointment_by_district(age=18, dose=1):
+    now = datetime.now()
+    dt_string = now.strftime("%d/%m/%Y %H:%M:%S")
+    print("date and time =", dt_string)
     try:
-        out = session.get(f"https://cdn-api.co-vin.in/api/v2/appointment/sessions/public/calendarByDistrict?district_id={DISTRICT_ID}&date={DATE}")
+        #out = session.get(f"https://cdn-api.co-vin.in/api/v2/appointment/sessions/public/calendarByDistrict?district_id={DISTRICT_ID}&date={DATE}")
+        out = session.get(f"https://cdn-api.co-vin.in/api/v2/appointment/sessions/calendarByDistrict?district_id={DISTRICT_ID}&date={DATE}")
         if out.status_code == 200:
             for j in out.json()['centers']:
                 for sessions in j['sessions']:

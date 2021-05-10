@@ -28,8 +28,8 @@ def generateOTP():
     data = {"secret":"U2FsdGVkX196RKSOE31ozbO/QRHGJ6RuEqacJuqWO4NQaA+7SO/1Ixzhqe/fkMtk4HjsB7Bjy1GKdC7qGOHeBg==","mobile": REGISTERED_MOBILE_NUMBER}
     resp = session.post('https://cdn-api.co-vin.in/api/v2/auth/generateMobileOTP', data=json.dumps(data))
     if resp.status_code == 200:
-        print("OTP SENT SUCCESSFULLY")
         os.system(f'say -v "Victoria" "Enter OTP"')
+        print("OTP SENT SUCCESSFULLY")
         out_json = resp.json()
         print(f"Transaction ID: {out_json}")
         return out_json
