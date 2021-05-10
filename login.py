@@ -13,7 +13,7 @@ def retry(func):
         for i in range(LIMIT):
             print("sending otp..........")
             txn=func()
-            if txn != False:
+            if txn:
                 is_otp_received = input("Press y/Y to continue if you received OTP.\nPress n/N to retry. Max Retry limit:3\n===>")
                 if is_otp_received == 'y' or is_otp_received == 'Y':
                     return txn
@@ -56,9 +56,9 @@ def validateOTP(txnId=None):
 def get_authenticated_session():
     # session = requests.Session()
     txn = generateOTP()
-    if txn != False:
+    if txn:
         token_json = validateOTP(txnId=txn['txnId'])
-        if token_json != False: 
+        if token_json:
             token = token_json['token']
             header = {'Authorization': f"Bearer {token}"}
             session.headers.update(header)

@@ -60,22 +60,29 @@ def book_appointment_by_district(age=18, dose=1):
             print(f"status code: {out.status_code}")
             print(f"response: {out.text}")
             out = get_authenticated_session()
-            if out != False:
+            if out:
                 book_appointment_by_district(age=18)
             else:
                 os.system(f'say -v "Victoria" "Failed to login"')
                 print("Failed to login")
                 return False
-        time.sleep(8)
+        time.sleep(7)
         book_appointment_by_district(age=18)
-    except ConnectionResetError:
-        os.system(f'say -v "Victoria" "Connection Reset Error"')
-        print("Connection Reset Error")
+    except (requests.exceptions.SSLError, requests.exceptions.ConnectionError, requests.exceptions.ReadTimeout) as e:
+        print(type(e), '::', e)
+        time.sleep(7)
+        out = get_authenticated_session()
+        if out:
+            book_appointment_by_district(age=18)
+        else:
+            os.system(f'say -v "Victoria" "Failed to login"')
+            print("Failed to login")
+            return False
 
 
 if __name__ == '__main__':
     out = get_authenticated_session()
-    if out != False:
+    if out:
         book_appointment_by_district(age=18)
     else:
         os.system(f'say -v "Victoria" "Failed to login"')
