@@ -17,7 +17,7 @@ REGISTERED_MOBILE_NUMBER = 6363640877 # 10 digit mobile number in int
 Beneficiaries_Ids = {
     '18':["47494580941600","69372972731330","80273475067100","48772031718880"],
     '45':[""]
-} #beficiary ids in str format
+} #beneficiary ids in str format
 
 headers = {
     'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.95 Safari/537.36',
