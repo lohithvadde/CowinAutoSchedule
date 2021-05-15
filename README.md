@@ -2,7 +2,7 @@
 
 ## A Python 3 Script to Schedule CoWin Vaccination Appointment. This script supports Captcha.  
 
-### Please add/change REGISTERED_MOBILE_NUMBER, Beneficiaries_Ids (Get this by logging into Cowin) and DISTRICT_ID (Use Cowin public APIs) as per your choice 
+### Please add/change REGISTERED_MOBILE_NUMBER, BENEFICIARY_IDS (Get this by logging into Cowin) and DISTRICT_ID (Use Cowin public APIs) as per your choice 
 
 After successfull login, Script will iterate over given District and will try to book appointment directly where slots are available to book. It is important to specify only desired District. Script won't ask you to choose center/slots/vaccine or any of the parameter.
 
