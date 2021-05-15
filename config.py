@@ -2,14 +2,13 @@ from datetime import timedelta, datetime
 DATE = (datetime.today() + timedelta(1)).strftime("%d-%m-%Y")
 LIMIT = 3 #otp retry limit
 
-PINCODES = [560001,560002,560003,560004] #list of pincodes by your preference.
-
 DISTRICT_ID = 363 #Check Book keeping folder
+PINCODES = [560001,560002,560003,560004] #list of pincodes by your preference.
 
 REGISTERED_MOBILE_NUMBER = 9848022338 # 10 digit mobile number in int
 
-Beneficiaries_Ids = {
-    '18':["47494580941600","69372972731330","80273475067100","48772031718880"],
+BENEFICIARY_IDS = {
+    '18':["97207920685230","60707677673280","23764339707240"],
     '45':[""]
 } #beneficiary ids in str format
 
