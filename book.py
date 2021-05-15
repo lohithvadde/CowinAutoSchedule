@@ -13,7 +13,6 @@ def get_districts(state_id):
         for j in output["districts"]:
             print(j)
 
-
 def get_beneficiaries():
     beneficiaries = session.get('https://cdn-api.co-vin.in/api/v2/appointment/beneficiaries')
     if beneficiaries.status_code == 200:
@@ -46,7 +45,7 @@ def get_captcha():
         print("captcha downloaded successfully")
 
 
-def book_appointment_by_district(age=18, dose=1):
+def book_appointment_by_district(age, dose):
     now = datetime.now()
     dt_string = now.strftime("%d/%m/%Y %H:%M:%S")
     print("date and time =", dt_string)
@@ -62,7 +61,7 @@ def book_appointment_by_district(age=18, dose=1):
                         book = {
                             "center_id": j['center_id'],
                             "session_id": sessions['session_id'],
-                            "beneficiaries": Beneficiaries_Ids[f"{age}"],
+                            "beneficiaries": BENEFICIARY_IDS[f"{age}"],
                             "slot": sessions['slots'][0],
                             "dose": dose
                         }
@@ -77,19 +76,19 @@ def book_appointment_by_district(age=18, dose=1):
             print(f"response: {out.text}")
             out = get_authenticated_session()
             if out:
-                book_appointment_by_district(age=18)
+                book_appointment_by_district({AGE},{DOSE})
             else:
                 os.system(f'say -v "Victoria" "Failed to login"')
                 print("Failed to login")
                 return False
         time.sleep(6)
-        book_appointment_by_district(age=18)
+        book_appointment_by_district({AGE},{DOSE})
     except (requests.exceptions.SSLError, requests.exceptions.ConnectionError, requests.exceptions.ReadTimeout) as e:
         print(type(e), '::', e)
         time.sleep(6)
         out = get_authenticated_session()
         if out:
-            book_appointment_by_district(age=18)
+            book_appointment_by_district({AGE},{DOSE})
         else:
             os.system(f'say -v "Victoria" "Failed to login"')
             print("Failed to login")
@@ -111,7 +110,7 @@ def book_appointment_by_pincodes(age=18, dose=1):
                             book = {
                                 "center_id": j['center_id'],
                                 "session_id": sessions['session_id'],
-                                "beneficiaries": Beneficiaries_Ids[f"{age}"],
+                                "beneficiaries": BENEFICIARY_IDS[f"{age}"],
                                 "slot": sessions['slots'][0],
                                 "dose": dose
                             }
@@ -126,19 +125,19 @@ def book_appointment_by_pincodes(age=18, dose=1):
                 print(f"response: {out.text}")
                 out = get_authenticated_session()
                 if out:
-                    book_appointment_by_pincodes(age=18)
+                    book_appointment_by_pincodes({AGE},{DOSE})
                 else:
                     os.system(f'say -v "Victoria" "Failed to login"')
                     print("Failed to login")
                     return False
         time.sleep(6)
-        book_appointment_by_pincodes(age=18)
+        book_appointment_by_pincodes({AGE},{DOSE})
     except (requests.exceptions.SSLError, requests.exceptions.ConnectionError, requests.exceptions.ReadTimeout) as e:
         print(type(e), '::', e)
         time.sleep(6)
         out = get_authenticated_session()
         if out:
-            book_appointment_by_pincodes(age=18)
+            book_appointment_by_pincodes({AGE},{DOSE})
         else:
             os.system(f'say -v "Victoria" "Failed to login"')
             print("Failed to login")
@@ -152,9 +151,9 @@ if __name__ == '__main__':
         out = get_authenticated_session()
         if out:
             if DISTRICT_ID:
-                book_appointment_by_district(age=18)
+                book_appointment_by_district({AGE},{DOSE})
             elif PINCODES:
-                book_appointment_by_pincodes(age=18)
+                book_appointment_by_pincodes({AGE},{DOSE})
             else:
                 os.system(f'say -v "Victoria" "Please enter district id or pin codes"')
                 print("Please enter district id or pin codes")

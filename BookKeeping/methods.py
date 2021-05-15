@@ -45,7 +45,7 @@ def book_appointment_by_pincodes(age=18, dose=1):
                         book = {
                             "center_id": j['center_id'],
                             "session_id": sessions['session_id'],
-                            "beneficiaries": Beneficiaries_Ids[f"{age}"],
+                            "beneficiaries": BENEFICIARY_IDS[f"{age}"],
                             "slot": sessions['slots'][0],
                             "dose": dose
                         }
@@ -69,7 +69,7 @@ def book_appointment_by_district(age=18, dose=1):
                         book = {
                             "center_id": j['center_id'],
                             "session_id": sessions['session_id'],
-                            "beneficiaries": Beneficiaries_Ids[f"{age}"],
+                            "beneficiaries": BENEFICIARY_IDS[f"{age}"],
                             "slot": sessions['slots'][0],
                             "dose": dose
                         }
