@@ -3,6 +3,17 @@ import time
 from login import *
 from datetime import datetime
 
+def get_districts(state_id):
+    url = f"https://cdn-api.co-vin.in/api/v2/admin/location/districts/{state_id}"
+    url = url.replace("{", "").replace("}", "")
+
+    out = session.get(url)
+    if out.status_code == 200:
+        output = out.json()
+        for j in output["districts"]:
+            print(j)
+
+
 def get_beneficiaries():
     beneficiaries = session.get('https://cdn-api.co-vin.in/api/v2/appointment/beneficiaries')
     if beneficiaries.status_code == 200:
@@ -71,11 +82,11 @@ def book_appointment_by_district(age=18, dose=1):
                 os.system(f'say -v "Victoria" "Failed to login"')
                 print("Failed to login")
                 return False
-        time.sleep(7)
+        time.sleep(6)
         book_appointment_by_district(age=18)
     except (requests.exceptions.SSLError, requests.exceptions.ConnectionError, requests.exceptions.ReadTimeout) as e:
         print(type(e), '::', e)
-        time.sleep(7)
+        time.sleep(6)
         out = get_authenticated_session()
         if out:
             book_appointment_by_district(age=18)
@@ -120,11 +131,11 @@ def book_appointment_by_pincodes(age=18, dose=1):
                     os.system(f'say -v "Victoria" "Failed to login"')
                     print("Failed to login")
                     return False
-        time.sleep(7)
+        time.sleep(6)
         book_appointment_by_pincodes(age=18)
     except (requests.exceptions.SSLError, requests.exceptions.ConnectionError, requests.exceptions.ReadTimeout) as e:
         print(type(e), '::', e)
-        time.sleep(7)
+        time.sleep(6)
         out = get_authenticated_session()
         if out:
             book_appointment_by_pincodes(age=18)
@@ -135,16 +146,19 @@ def book_appointment_by_pincodes(age=18, dose=1):
 
 
 if __name__ == '__main__':
-    out = get_authenticated_session()
-    if out:
-        if DISTRICT_ID:
-            book_appointment_by_district(age=18)
-        elif PINCODES:
-            book_appointment_by_pincodes(age=18)
-        else:
-            os.system(f'say -v "Victoria" "Please enter district id or pin codes"')
-            print("Please enter district id or pin codes")
-            exit(1)
+    if GET_DISTRICT_IDS:
+        get_districts({GET_DISTRICT_IDS})
     else:
-        os.system(f'say -v "Victoria" "Failed to login"')
-        print("Failed to login")
+        out = get_authenticated_session()
+        if out:
+            if DISTRICT_ID:
+                book_appointment_by_district(age=18)
+            elif PINCODES:
+                book_appointment_by_pincodes(age=18)
+            else:
+                os.system(f'say -v "Victoria" "Please enter district id or pin codes"')
+                print("Please enter district id or pin codes")
+                exit(1)
+        else:
+            os.system(f'say -v "Victoria" "Failed to login"')
+            print("Failed to login")
