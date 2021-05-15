@@ -4,7 +4,7 @@ from login import *
 from datetime import datetime
 
 
-def get_districts(state_id):
+def get_districts(state_id: int):
     url = f"https://cdn-api.co-vin.in/api/v2/admin/location/districts/{state_id}"
     url = url.replace("{", "").replace("}", "")
 
@@ -151,7 +151,7 @@ def book_appointment_by_pincodes(age: int, dose: int):
 
 if __name__ == '__main__':
     if GET_DISTRICT_IDS:
-        get_districts({GET_DISTRICT_IDS})
+        get_districts(GET_DISTRICT_IDS)
     else:
         out = get_authenticated_session()
         if out:
