@@ -60,8 +60,11 @@ def book_appointment_by_district(age: int, dose: int):
             for j in out.json()['centers']:
                 for sessions in j['sessions']:
                     # print(f"\ncenter name: {j['name']} capacity: {sessions['available_capacity']} slots: {sessions['slots']}")
-                    if sessions['available_capacity'] > 0 and sessions['min_age_limit'] == age:
+                    if sessions['available_capacity'] > len(BENEFICIARY_IDS[f"{age}"]) and sessions['min_age_limit'] == age:
                         print(f"\ncenter name: {j['name']} capacity: {sessions['available_capacity']} slots: {sessions['slots']}")
+                        if DOSE == 2 and VACCINE != sessions['vaccine']:
+                            print(f"looking for {VACCINE} but availability is for {sessions['vaccine']}")
+                            book_appointment_by_district(AGE, DOSE)
                         book = {
                             "center_id": j['center_id'],
                             "session_id": sessions['session_id'],
@@ -85,11 +88,11 @@ def book_appointment_by_district(age: int, dose: int):
                 os.system(f'say -v "Victoria" "Failed to login"')
                 print("Failed to login")
                 return False
-        time.sleep(6)
+        time.sleep(SLEEP_TIME)
         book_appointment_by_district(AGE, DOSE)
     except (requests.exceptions.SSLError, requests.exceptions.ConnectionError, requests.exceptions.ReadTimeout) as e:
         print(type(e), '::', e)
-        time.sleep(6)
+        time.sleep(SLEEP_TIME)
         out = get_authenticated_session()
         if out:
             book_appointment_by_district(AGE, DOSE)
@@ -110,8 +113,11 @@ def book_appointment_by_pincodes(age: int, dose: int):
                 for j in out.json()['centers']:
                     for sessions in j['sessions']:
                         # print(f"\ncenter name: {j['name']} capacity: {sessions['available_capacity']} slots: {sessions['slots']}")
-                        if sessions['available_capacity'] > 0 and sessions['min_age_limit'] == age:
+                        if sessions['available_capacity'] > len(BENEFICIARY_IDS[f"{age}"]) and sessions['min_age_limit'] == age:
                             print(f"\ncenter name: {j['name']} capacity: {sessions['available_capacity']} slots: {sessions['slots']}")
+                            if DOSE == 2 and VACCINE != sessions['vaccine']:
+                                print(f"looking for {VACCINE} but availability is for {sessions['vaccine']}")
+                                book_appointment_by_district(AGE, DOSE)
                             book = {
                                 "center_id": j['center_id'],
                                 "session_id": sessions['session_id'],
@@ -135,11 +141,11 @@ def book_appointment_by_pincodes(age: int, dose: int):
                     os.system(f'say -v "Victoria" "Failed to login"')
                     print("Failed to login")
                     return False
-        time.sleep(6)
+        time.sleep(SLEEP_TIME)
         book_appointment_by_pincodes(AGE, DOSE)
     except (requests.exceptions.SSLError, requests.exceptions.ConnectionError, requests.exceptions.ReadTimeout) as e:
         print(type(e), '::', e)
-        time.sleep(6)
+        time.sleep(SLEEP_TIME)
         out = get_authenticated_session()
         if out:
             book_appointment_by_pincodes(AGE, DOSE)
