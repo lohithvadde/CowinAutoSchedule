@@ -62,21 +62,21 @@ def book_appointment_by_district(age: int, dose: int):
                     # print(f"\ncenter name: {j['name']} capacity: {sessions['available_capacity']} slots: {sessions['slots']}")
                     if sessions['available_capacity'] > len(BENEFICIARY_IDS[f"{age}"]) and sessions['min_age_limit'] == age:
                         print(f"\ncenter name: {j['name']} capacity: {sessions['available_capacity']} slots: {sessions['slots']}")
-                        if DOSE == 2 and VACCINE != sessions['vaccine']:
-                            print(f"looking for {VACCINE} but availability is for {sessions['vaccine']}")
-                            book_appointment_by_district(AGE, DOSE)
-                        book = {
-                            "center_id": j['center_id'],
-                            "session_id": sessions['session_id'],
-                            "beneficiaries": BENEFICIARY_IDS[f"{age}"],
-                            "slot": sessions['slots'][0],
-                            "dose": dose
-                        }
-                        stop = book_slot(book)
-                        if stop:
-                            os.system(f'say -v "Victoria" "Booking Successful"')
-                            print("Booking Successful")
-                            return True
+                        if (DOSE == 1 and sessions['available_capacity_dose1'] > len(BENEFICIARY_IDS[f"{age}"])) or \
+                            (DOSE == 2 and sessions['available_capacity_dose2'] > len(BENEFICIARY_IDS[f"{age}"]) and \
+                             VACCINE == sessions['vaccine']):
+                            book = {
+                                "center_id": j['center_id'],
+                                "session_id": sessions['session_id'],
+                                "beneficiaries": BENEFICIARY_IDS[f"{age}"],
+                                "slot": sessions['slots'][0],
+                                "dose": dose
+                            }
+                            stop = book_slot(book)
+                            if stop:
+                                os.system(f'say -v "Victoria" "Booking Successful"')
+                                print("Booking Successful")
+                                return True
         else:
             os.system(f'say -v "Victoria" "Session expired"')
             print(f"status code: {out.status_code}")
@@ -115,21 +115,21 @@ def book_appointment_by_pincodes(age: int, dose: int):
                         # print(f"\ncenter name: {j['name']} capacity: {sessions['available_capacity']} slots: {sessions['slots']}")
                         if sessions['available_capacity'] > len(BENEFICIARY_IDS[f"{age}"]) and sessions['min_age_limit'] == age:
                             print(f"\ncenter name: {j['name']} capacity: {sessions['available_capacity']} slots: {sessions['slots']}")
-                            if DOSE == 2 and VACCINE != sessions['vaccine']:
-                                print(f"looking for {VACCINE} but availability is for {sessions['vaccine']}")
-                                book_appointment_by_district(AGE, DOSE)
-                            book = {
-                                "center_id": j['center_id'],
-                                "session_id": sessions['session_id'],
-                                "beneficiaries": BENEFICIARY_IDS[f"{age}"],
-                                "slot": sessions['slots'][0],
-                                "dose": dose
-                            }
-                            stop = book_slot(book)
-                            if stop:
-                                os.system(f'say -v "Victoria" "Booking Successful"')
-                                print("Booking Successful")
-                                return True
+                            if (DOSE == 1 and sessions['available_capacity_dose1'] > len(BENEFICIARY_IDS[f"{age}"])) or \
+                                (DOSE == 2 and sessions['available_capacity_dose2'] > len(BENEFICIARY_IDS[f"{age}"]) and \
+                                 VACCINE == sessions['vaccine']):
+                                book = {
+                                    "center_id": j['center_id'],
+                                    "session_id": sessions['session_id'],
+                                    "beneficiaries": BENEFICIARY_IDS[f"{age}"],
+                                    "slot": sessions['slots'][0],
+                                    "dose": dose
+                                }
+                                stop = book_slot(book)
+                                if stop:
+                                    os.system(f'say -v "Victoria" "Booking Successful"')
+                                    print("Booking Successful")
+                                    return True
             else:
                 os.system(f'say -v "Victoria" "Session expired"')
                 print(f"status code: {out.status_code}")
