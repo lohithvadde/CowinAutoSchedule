@@ -1,6 +1,6 @@
 
 
-A Python 3 Script to Schedule CoWin Vaccination Appointment. This script supports Captcha.  
+Python3 script to schedule an appointment in cowin.
 
 Please add/change REGISTERED_MOBILE_NUMBER, BENEFICIARY_IDS (Get this by logging into Cowin) and DISTRICT_ID (Use Cowin public APIs) as per your choice.
 
