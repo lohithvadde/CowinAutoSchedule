@@ -2,7 +2,7 @@ import time
 
 from login import *
 from datetime import datetime
-
+from captcha import captcha_builder
 
 def get_districts(state_id: int):
     url = f"https://cdn-api.co-vin.in/api/v2/admin/location/districts/{state_id}"
@@ -26,9 +26,8 @@ def get_beneficiaries():
 
 def book_slot(book):
     print(f"Trying to book: {book}")
-    get_captcha()
-    os.system(f'say -v "Victoria" "Enter Captcha"')
-    book["captcha"] = input("Enter Captcha:")
+    captcha = get_captcha()
+    book["captcha"] = captcha
     book = json.dumps(book)
     resp = session.post("https://cdn-api.co-vin.in/api/v2/appointment/schedule", data=book)
     if resp.status_code == 200:
@@ -47,6 +46,8 @@ def get_captcha():
         with open("svg.html", "w") as f:
             f.write(captcha)
         print("captcha downloaded successfully")
+        os.system(f'say -v "Victoria" "Enter Captcha"')
+        return captcha_builder(out.json())
 
 
 def book_appointment_by_district(age: int, dose: int):
@@ -69,7 +70,7 @@ def book_appointment_by_district(age: int, dose: int):
                                 "center_id": j['center_id'],
                                 "session_id": sessions['session_id'],
                                 "beneficiaries": BENEFICIARY_IDS[f"{age}"],
-                                "slot": sessions['slots'][0],
+                                "slot": sessions['slots'][1],
                                 "dose": dose
                             }
                             stop = book_slot(book)
@@ -122,7 +123,7 @@ def book_appointment_by_pincodes(age: int, dose: int):
                                     "center_id": j['center_id'],
                                     "session_id": sessions['session_id'],
                                     "beneficiaries": BENEFICIARY_IDS[f"{age}"],
-                                    "slot": sessions['slots'][0],
+                                    "slot": sessions['slots'][1],
                                     "dose": dose
                                 }
                                 stop = book_slot(book)

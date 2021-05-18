@@ -1,7 +1,8 @@
 from datetime import timedelta, datetime
 DATE = (datetime.today() + timedelta(1)).strftime("%d-%m-%Y")
+
 LIMIT = 3 #otp retry limit
-SLEEP_TIME = 5
+SLEEP_TIME = 3.5
 
 DISTRICT_ID = 363 #Check Book keeping folder
 PINCODES = [560001,560002,560003,560004] #list of pincodes by your preference.
