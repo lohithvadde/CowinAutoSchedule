@@ -2,7 +2,8 @@ import time
 
 from login import *
 from datetime import datetime
-from captcha import captcha_builder
+from captcha import captcha_builder, captcha_builder_auto
+
 
 def get_districts(state_id: int):
     url = f"https://cdn-api.co-vin.in/api/v2/admin/location/districts/{state_id}"
@@ -27,11 +28,11 @@ def get_beneficiaries():
 def book_slot(book):
     print(f"Trying to book: {book}")
     captcha = get_captcha()
+    print(f"Captcha decoded: {captcha}")
     book["captcha"] = captcha
     book = json.dumps(book)
     resp = session.post("https://cdn-api.co-vin.in/api/v2/appointment/schedule", data=book)
     if resp.status_code == 200:
-        print("Scheduled Successfully.")
         print(f"response: {resp.json()}")
         return True
     else:
@@ -42,12 +43,13 @@ def book_slot(book):
 def get_captcha():
     out = session.post("https://cdn-api.co-vin.in/api/v2/auth/getRecaptcha")
     if out.status_code == 200:
-        captcha = out.json()['captcha']
-        with open("svg.html", "w") as f:
-            f.write(captcha)
-        print("captcha downloaded successfully")
-        os.system(f'say -v "Victoria" "Enter Captcha"')
-        return captcha_builder(out.json())
+        # captcha = out.json()['captcha']
+        # with open("svg.html", "w") as f:
+        #     f.write(captcha)
+        # print("captcha downloaded successfully")
+        # os.system(f'say -v "Victoria" "Enter Captcha"')
+        # return captcha_builder(out.json())
+        return captcha_builder_auto(out.json())
 
 
 def book_appointment_by_district(age: int, dose: int):
@@ -162,6 +164,7 @@ if __name__ == '__main__':
     else:
         out = get_authenticated_session()
         if out:
+            # get_captcha() For testing captcha
             if DISTRICT_ID:
                 book_appointment_by_district(AGE, DOSE)
             elif PINCODES:

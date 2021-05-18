@@ -7,7 +7,7 @@ SLEEP_TIME = 3.5
 DISTRICT_ID = 363 #Check Book keeping folder
 PINCODES = [560001,560002,560003,560004] #list of pincodes by your preference.
 
-REGISTERED_MOBILE_NUMBER = 9711987543 # 10 digit mobile number in int
+REGISTERED_MOBILE_NUMBER = 6363640877 # 10 digit mobile number in int
 
 BENEFICIARY_IDS = {
     '18':["97207920685230","60707677673280","23764339707240"],
