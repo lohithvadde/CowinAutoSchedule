@@ -159,6 +159,7 @@ def book_appointment_by_pincodes(age: int, dose: int):
 
 
 if __name__ == '__main__':
+    sys.setrecursionlimit(10000)
     if GET_DISTRICT_IDS:
         get_districts(GET_DISTRICT_IDS)
     else:
