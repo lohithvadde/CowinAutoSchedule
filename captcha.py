@@ -15,7 +15,7 @@ captcha_svg = './captcha/captcha.svg'
 captcha_png = './captcha/captcha.png'
 
 
-def captcha_builder(resp):
+def captcha_builder_manual(resp):
     with open(captcha_svgFile, 'w') as f:
         f.write(re.sub('(<path d=)(.*?)(fill="none"/>)', '', resp['captcha']))
 
@@ -55,5 +55,26 @@ def captcha_builder_auto(resp):
         print(f"Captcha text: {captcha_text}")
     else:
         print(f"Task finished with error: {solver.error_code}")
-
     return captcha_text
+
+
+def captcha_builder_premium(resp):
+    # Yet to finish this. Pre caching of captcha after every 100 seconds.
+    out = session.post("https://cdn-api.co-vin.in/api/v2/auth/getRecaptcha")
+    if out.status_code == 200:
+        with open('./captcha/captcha.svg', 'w') as f:
+            f.write(re.sub('(<path d=)(.*?)(fill=\"none\"/>)', '', resp['captcha']))
+
+        drawing = svg2rlg('./captcha/captcha.svg')
+        renderPM.drawToFile(drawing, "./captcha/captcha.png", fmt="PNG")
+
+        solver = imagecaptcha()
+        solver.set_verbose(1)
+        solver.set_key(API_KEY)
+        captcha_text = solver.solve_and_return_solution("./captcha/captcha.png")
+
+        if captcha_text != 0:
+            print(f"Captcha text: {captcha_text}")
+        else:
+            print(f"Task finished with error: {solver.error_code}")
+        return captcha_text

@@ -2,7 +2,7 @@ import time
 
 from login import *
 from datetime import datetime
-from captcha import captcha_builder, captcha_builder_auto
+from captcha import captcha_builder_manual, captcha_builder_auto
 
 
 def get_districts(state_id: int):
@@ -28,7 +28,9 @@ def get_beneficiaries():
 def book_slot(book):
     print(f"Trying to book: {book}")
     captcha = get_captcha()
-    print(f"Captcha decoded: {captcha}")
+    if captcha == 'None' or len(captcha) < 5:
+        print(f"Trying captcha again")
+        captcha = get_captcha()  # sometimes we don't get captcha in the first attempt or the captcha has just 4 letters
     book["captcha"] = captcha
     book = json.dumps(book)
     resp = session.post("https://cdn-api.co-vin.in/api/v2/appointment/schedule", data=book)
@@ -43,13 +45,17 @@ def book_slot(book):
 def get_captcha():
     out = session.post("https://cdn-api.co-vin.in/api/v2/auth/getRecaptcha")
     if out.status_code == 200:
-        # captcha = out.json()['captcha']
-        # with open("svg.html", "w") as f:
-        #     f.write(captcha)
-        # print("captcha downloaded successfully")
-        # os.system(f'say -v "Victoria" "Enter Captcha"')
-        # return captcha_builder(out.json())
-        return captcha_builder_auto(out.json())
+        if CAPTCHA_MODE == 'MANUAL':
+            captcha = out.json()['captcha']
+            with open("svg.html", "w") as f:
+                f.write(captcha)
+            print("captcha downloaded successfully")
+            os.system(f'say -v "Victoria" "Enter Captcha"')
+            return captcha_builder_manual(out.json())
+        elif CAPTCHA_MODE == 'AUTO':
+            return captcha_builder_auto(out.json())
+    else:
+        return 'None'
 
 
 def book_appointment_by_district(age: int, dose: int):
@@ -57,28 +63,28 @@ def book_appointment_by_district(age: int, dose: int):
     dt_string = now.strftime("%d/%m/%Y %H:%M:%S")
     print("date and time =", dt_string)
     try:
-        # out = session.get(f"https://cdn-api.co-vin.in/api/v2/appointment/sessions/public/calendarByDistrict?district_id={DISTRICT_ID}&date={DATE}")
         out = session.get(f"https://cdn-api.co-vin.in/api/v2/appointment/sessions/calendarByDistrict?district_id={DISTRICT_ID}&date={DATE}")
         if out.status_code == 200:
             for j in out.json()['centers']:
                 for sessions in j['sessions']:
-                    # print(f"\ncenter name: {j['name']} capacity: {sessions['available_capacity']} slots: {sessions['slots']}")
                     if sessions['available_capacity'] > len(BENEFICIARY_IDS[f"{age}"]) and sessions['min_age_limit'] == age:
                         print(f"\ncenter name: {j['name']} capacity: {sessions['available_capacity']} slots: {sessions['slots']}")
-                        if (DOSE == 1 and sessions['available_capacity_dose1'] > len(BENEFICIARY_IDS[f"{age}"])) or \
-                            (DOSE == 2 and sessions['available_capacity_dose2'] > len(BENEFICIARY_IDS[f"{age}"]) and \
-                             VACCINE == sessions['vaccine']):
+                        if (DOSE == 1 and sessions['available_capacity_dose1'] > len(BENEFICIARY_IDS[f"{age}"]) and (VACCINE == 'ANY' or VACCINE == sessions['vaccine'])) or \
+                            (DOSE == 2 and sessions['available_capacity_dose2'] > len(BENEFICIARY_IDS[f"{age}"]) and VACCINE == sessions['vaccine']):
                             book = {
                                 "center_id": j['center_id'],
                                 "session_id": sessions['session_id'],
                                 "beneficiaries": BENEFICIARY_IDS[f"{age}"],
-                                "slot": sessions['slots'][1],
+                                "slot": sessions['slots'][0],
                                 "dose": dose
                             }
                             stop = book_slot(book)
                             if stop:
                                 os.system(f'say -v "Victoria" "Booking Successful"')
                                 print("Booking Successful")
+                                now = datetime.now()
+                                dt_string = now.strftime("%d/%m/%Y %H:%M:%S")
+                                print("date and time =", dt_string)
                                 return True
         else:
             os.system(f'say -v "Victoria" "Session expired"')
@@ -115,23 +121,24 @@ def book_appointment_by_pincodes(age: int, dose: int):
             if out.status_code == 200:
                 for j in out.json()['centers']:
                     for sessions in j['sessions']:
-                        # print(f"\ncenter name: {j['name']} capacity: {sessions['available_capacity']} slots: {sessions['slots']}")
                         if sessions['available_capacity'] > len(BENEFICIARY_IDS[f"{age}"]) and sessions['min_age_limit'] == age:
                             print(f"\ncenter name: {j['name']} capacity: {sessions['available_capacity']} slots: {sessions['slots']}")
-                            if (DOSE == 1 and sessions['available_capacity_dose1'] > len(BENEFICIARY_IDS[f"{age}"])) or \
-                                (DOSE == 2 and sessions['available_capacity_dose2'] > len(BENEFICIARY_IDS[f"{age}"]) and \
-                                 VACCINE == sessions['vaccine']):
+                            if (DOSE == 1 and sessions['available_capacity_dose1'] > len(BENEFICIARY_IDS[f"{age}"]) and (VACCINE == 'ANY' or VACCINE == sessions['vaccine'])) or \
+                                (DOSE == 2 and sessions['available_capacity_dose2'] > len(BENEFICIARY_IDS[f"{age}"]) and VACCINE == sessions['vaccine']):
                                 book = {
                                     "center_id": j['center_id'],
                                     "session_id": sessions['session_id'],
                                     "beneficiaries": BENEFICIARY_IDS[f"{age}"],
-                                    "slot": sessions['slots'][1],
+                                    "slot": sessions['slots'][0],
                                     "dose": dose
                                 }
                                 stop = book_slot(book)
                                 if stop:
                                     os.system(f'say -v "Victoria" "Booking Successful"')
                                     print("Booking Successful")
+                                    now = datetime.now()
+                                    dt_string = now.strftime("%d/%m/%Y %H:%M:%S")
+                                    print("date and time =", dt_string)
                                     return True
             else:
                 os.system(f'say -v "Victoria" "Session expired"')
@@ -165,7 +172,13 @@ if __name__ == '__main__':
     else:
         out = get_authenticated_session()
         if out:
-            # get_captcha() For testing captcha
+            # now = datetime.now()
+            # dt_string = now.strftime("%d/%m/%Y %H:%M:%S")
+            # print("date and time =", dt_string)
+            # get_captcha() #For testing captcha
+            # now = datetime.now()
+            # dt_string = now.strftime("%d/%m/%Y %H:%M:%S")
+            # print("date and time =", dt_string)
             if DISTRICT_ID:
                 book_appointment_by_district(AGE, DOSE)
             elif PINCODES:
