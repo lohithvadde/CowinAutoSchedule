@@ -68,9 +68,9 @@ def book_appointment_by_district(age: int, dose: int):
             for j in out.json()['centers']:
                 for sessions in j['sessions']:
                     if sessions['available_capacity'] > len(BENEFICIARY_IDS[f"{age}"]) and sessions['min_age_limit'] == age:
-                        print(f"\ncenter name: {j['name']} capacity: {sessions['available_capacity']} slots: {sessions['slots']}")
                         if (DOSE == 1 and sessions['available_capacity_dose1'] > len(BENEFICIARY_IDS[f"{age}"]) and (VACCINE == 'ANY' or VACCINE == sessions['vaccine'])) or \
-                            (DOSE == 2 and sessions['available_capacity_dose2'] > len(BENEFICIARY_IDS[f"{age}"]) and VACCINE == sessions['vaccine']):
+                                (DOSE == 2 and sessions['available_capacity_dose2'] > len(BENEFICIARY_IDS[f"{age}"]) and VACCINE == sessions['vaccine']):
+                            print(f"\ncenter name: {j['name']} capacity: {sessions['available_capacity']} slots: {sessions['slots']}")
                             book = {
                                 "center_id": j['center_id'],
                                 "session_id": sessions['session_id'],
@@ -87,9 +87,10 @@ def book_appointment_by_district(age: int, dose: int):
                                 print("date and time =", dt_string)
                                 return True
         else:
-            os.system(f'say -v "Victoria" "Session expired"')
+            os.system(f'say -v "Victoria" "Session expired wait for 30 seconds"')
             print(f"status code: {out.status_code}")
             print(f"response: {out.text}")
+            time.sleep(30)
             out = get_authenticated_session()
             if out:
                 book_appointment_by_district(AGE, DOSE)
@@ -122,9 +123,9 @@ def book_appointment_by_pincodes(age: int, dose: int):
                 for j in out.json()['centers']:
                     for sessions in j['sessions']:
                         if sessions['available_capacity'] > len(BENEFICIARY_IDS[f"{age}"]) and sessions['min_age_limit'] == age:
-                            print(f"\ncenter name: {j['name']} capacity: {sessions['available_capacity']} slots: {sessions['slots']}")
                             if (DOSE == 1 and sessions['available_capacity_dose1'] > len(BENEFICIARY_IDS[f"{age}"]) and (VACCINE == 'ANY' or VACCINE == sessions['vaccine'])) or \
-                                (DOSE == 2 and sessions['available_capacity_dose2'] > len(BENEFICIARY_IDS[f"{age}"]) and VACCINE == sessions['vaccine']):
+                                    (DOSE == 2 and sessions['available_capacity_dose2'] > len(BENEFICIARY_IDS[f"{age}"]) and VACCINE == sessions['vaccine']):
+                                print(f"\ncenter name: {j['name']} capacity: {sessions['available_capacity']} slots: {sessions['slots']}")
                                 book = {
                                     "center_id": j['center_id'],
                                     "session_id": sessions['session_id'],
@@ -141,9 +142,10 @@ def book_appointment_by_pincodes(age: int, dose: int):
                                     print("date and time =", dt_string)
                                     return True
             else:
-                os.system(f'say -v "Victoria" "Session expired"')
+                os.system(f'say -v "Victoria" "Session expired wait for 30 seconds"')
                 print(f"status code: {out.status_code}")
                 print(f"response: {out.text}")
+                time.sleep(30)
                 out = get_authenticated_session()
                 if out:
                     book_appointment_by_pincodes(AGE, DOSE)

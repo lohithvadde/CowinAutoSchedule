@@ -1,5 +1,5 @@
 from datetime import timedelta, datetime
-DATE = (datetime.today() + timedelta(1)).strftime("%d-%m-%Y")  # timedelta(1) means any dates from tomorrow.
+DATE = (datetime.today() + timedelta(0)).strftime("%d-%m-%Y")  # timedelta(1) means any dates from tomorrow.
 
 LIMIT = 3  # otp retry limit
 SLEEP_TIME = 3.5  # Change this to 5 or more when doing by pin code
@@ -8,9 +8,9 @@ CAPTCHA_MODE = 'AUTO'  # AUTO or MANUAL
 DISTRICT_ID = 395  # Check Book keeping folder for district ids. If it's not there, enter state id in the GET_DISTRICT_IDS and run.
 PINCODES = [560001,560002,560003,560004]  # Put DISTRICT_ID = 0 when you enter pin codes. Don't use more than 4 pin codes
 
-REGISTERED_MOBILE_NUMBER = 6363640877  # 10 digit mobile number in int
+REGISTERED_MOBILE_NUMBER = 7710028306  # 10 digit mobile number in int
 BENEFICIARY_IDS = {
-    '18':["62867477281530"],
+    '18':["43209060670710","16387834803410"],
     '45':[""]
 }  # beneficiary ids in str format and comma separated ids
 AGE = 18
