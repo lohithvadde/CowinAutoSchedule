@@ -1,14 +1,15 @@
+import _thread
 import time
 
+import captcha
 from login import *
 from datetime import datetime
-from captcha import captcha_builder_manual, captcha_builder_auto
+from captcha import captcha_builder_manual, captcha_builder_auto, captcha_builder_premium
 
 
 def get_districts(state_id: int):
     url = f"https://cdn-api.co-vin.in/api/v2/admin/location/districts/{state_id}"
     url = url.replace("{", "").replace("}", "")
-
     out = session.get(url)
     if out.status_code == 200:
         output = out.json()
@@ -27,11 +28,11 @@ def get_beneficiaries():
 
 def book_slot(book):
     print(f"Trying to book: {book}")
-    captcha = get_captcha()
-    if captcha == 'None' or len(captcha) < 5:
+    captcha_result = get_captcha()
+    if captcha_result == 'None' or len(captcha_result) < 5:
         print(f"Trying captcha again")
-        captcha = get_captcha()  # sometimes we don't get captcha in the first attempt or the captcha has just 4 letters
-    book["captcha"] = captcha
+        captcha_result = get_captcha()  # sometimes we don't get captcha in the first attempt or the captcha has just 4 letters
+    book["captcha"] = captcha_result
     book = json.dumps(book)
     resp = session.post("https://cdn-api.co-vin.in/api/v2/appointment/schedule", data=book)
     if resp.status_code == 200:
@@ -43,19 +44,22 @@ def book_slot(book):
 
 
 def get_captcha():
-    out = session.post("https://cdn-api.co-vin.in/api/v2/auth/getRecaptcha")
-    if out.status_code == 200:
-        if CAPTCHA_MODE == 'MANUAL':
-            captcha = out.json()['captcha']
-            with open("svg.html", "w") as f:
-                f.write(captcha)
-            print("captcha downloaded successfully")
-            os.system(f'say -v "Victoria" "Enter Captcha"')
-            return captcha_builder_manual(out.json())
-        elif CAPTCHA_MODE == 'AUTO':
-            return captcha_builder_auto(out.json())
+    if CAPTCHA_MODE == 'PREMIUM':
+        return captcha.captcha_text_decoded
     else:
-        return 'None'
+        out = session.post("https://cdn-api.co-vin.in/api/v2/auth/getRecaptcha")
+        if out.status_code == 200:
+            if CAPTCHA_MODE == 'MANUAL':
+                captcha_response = out.json()['captcha']
+                with open("svg.html", "w") as f:
+                    f.write(captcha_response)
+                print("captcha downloaded successfully")
+                os.system(f'say -v "Victoria" "Enter Captcha"')
+                return captcha_builder_manual(out.json())
+            elif CAPTCHA_MODE == 'AUTO':
+                return captcha_builder_auto(out.json())
+        else:
+            return 'None'
 
 
 def book_appointment_by_district(age: int, dose: int):
@@ -181,6 +185,12 @@ if __name__ == '__main__':
             # now = datetime.now()
             # dt_string = now.strftime("%d/%m/%Y %H:%M:%S")
             # print("date and time =", dt_string)
+            if CAPTCHA_MODE == 'PREMIUM':
+                try:
+                    _thread.start_new_thread(captcha_builder_premium, (100, session.headers, 1))
+                except:
+                    print("Error: unable to start thread")
+
             if DISTRICT_ID:
                 book_appointment_by_district(AGE, DOSE)
             elif PINCODES:
