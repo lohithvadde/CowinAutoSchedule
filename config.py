@@ -3,7 +3,7 @@ DATE = (datetime.today() + timedelta(0)).strftime("%d-%m-%Y")  # timedelta(1) me
 
 LIMIT = 3  # otp retry limit
 SLEEP_TIME = 3.5  # Change this to 5 or more when doing by pin code
-CAPTCHA_MODE = 'PREMIUM'  # AUTO or MANUAL or PREMIUM
+CAPTCHA_MODE = 'EXTRAORDINARY'  # AUTO or MANUAL or PREMIUM or EXTRAORDINARY
 
 DISTRICT_ID = 312  # Check Book keeping folder for district ids. If it's not there, enter state id in the GET_DISTRICT_IDS and run.
 PINCODES = [560001,560002,560003,560004]  # Put DISTRICT_ID = 0 when you enter pin codes. Don't use more than 4 pin codes

@@ -4,7 +4,7 @@ import time
 import captcha
 from login import *
 from datetime import datetime
-from captcha import captcha_builder_manual, captcha_builder_auto, captcha_builder_premium
+from captcha import captcha_builder_manual, captcha_builder_auto, captcha_builder_premium, captcha_builder_extraordinary
 
 
 def get_districts(state_id: int):
@@ -58,6 +58,13 @@ def get_captcha():
                 return captcha_builder_manual(out.json())
             elif CAPTCHA_MODE == 'AUTO':
                 return captcha_builder_auto(out.json())
+            elif CAPTCHA_MODE == 'EXTRAORDINARY':
+                captcha_resp = captcha_builder_extraordinary(session.headers)
+                if not captcha_resp:
+                    print("Could not read captcha from string, found empty captcha")
+                    return captcha_builder_auto(out.json())
+                else:
+                    return captcha_resp
         else:
             return 'None'
 
