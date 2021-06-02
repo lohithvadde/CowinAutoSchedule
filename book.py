@@ -1,11 +1,13 @@
 import _thread
+import random
 import time
-
 import captcha
+
 from login import *
 from datetime import datetime
 from captcha import captcha_builder_manual, captcha_builder_auto, captcha_builder_premium, captcha_builder_extraordinary
 
+start_timer = time.time()
 
 def get_districts(state_id: int):
     url = f"https://cdn-api.co-vin.in/api/v2/admin/location/districts/{state_id}"
@@ -73,6 +75,20 @@ def book_appointment_by_district(age: int, dose: int):
     now = datetime.now()
     dt_string = now.strftime("%d/%m/%Y %H:%M:%S")
     print("date and time =", dt_string)
+    # Force exit after 9.5 mins
+    global start_timer
+    time_now = time.time()
+    if RATE_LIMITER and (time_now - start_timer > 570.00):
+        start_timer = time_now
+        os.system(f'say -v "Victoria" "Time out. Re login"')
+        out = get_authenticated_session()
+        if out:
+            book_appointment_by_district(AGE, DOSE)
+        else:
+            os.system(f'say -v "Victoria" "Failed to login"')
+            print("Failed to login")
+            return False
+    # Main logic
     try:
         out = session.get(f"https://cdn-api.co-vin.in/api/v2/appointment/sessions/calendarByDistrict?district_id={DISTRICT_ID}&date={DATE}")
         if out.status_code == 200:
@@ -109,7 +125,7 @@ def book_appointment_by_district(age: int, dose: int):
                 os.system(f'say -v "Victoria" "Failed to login"')
                 print("Failed to login")
                 return False
-        time.sleep(SLEEP_TIME)
+        time.sleep(random.randint(3,6))
         book_appointment_by_district(AGE, DOSE)
     except (requests.exceptions.SSLError, requests.exceptions.ConnectionError, requests.exceptions.ReadTimeout) as e:
         print(type(e), '::', e)
@@ -127,6 +143,20 @@ def book_appointment_by_pincodes(age: int, dose: int):
     now = datetime.now()
     dt_string = now.strftime("%d/%m/%Y %H:%M:%S")
     print("date and time =", dt_string)
+    # Force exit after 9.5 mins
+    global start_timer
+    time_now = time.time()
+    if RATE_LIMITER and (time_now - start_timer > 570.00):
+        start_timer = time_now
+        os.system(f'say -v "Victoria" "Time out. Re login"')
+        out = get_authenticated_session()
+        if out:
+            book_appointment_by_district(AGE, DOSE)
+        else:
+            os.system(f'say -v "Victoria" "Failed to login"')
+            print("Failed to login")
+            return False
+    # Main logic
     try:
         for i in PINCODES:
             out = session.get(f"https://cdn-api.co-vin.in/api/v2/appointment/sessions/calendarByPin?pincode={i}&date={DATE}")
@@ -164,7 +194,7 @@ def book_appointment_by_pincodes(age: int, dose: int):
                     os.system(f'say -v "Victoria" "Failed to login"')
                     print("Failed to login")
                     return False
-        time.sleep(SLEEP_TIME)
+        time.sleep(random.randint(3,6))
         book_appointment_by_pincodes(AGE, DOSE)
     except (requests.exceptions.SSLError, requests.exceptions.ConnectionError, requests.exceptions.ReadTimeout) as e:
         print(type(e), '::', e)
@@ -185,13 +215,6 @@ if __name__ == '__main__':
     else:
         out = get_authenticated_session()
         if out:
-            # now = datetime.now()
-            # dt_string = now.strftime("%d/%m/%Y %H:%M:%S")
-            # print("date and time =", dt_string)
-            # get_captcha() #For testing captcha
-            # now = datetime.now()
-            # dt_string = now.strftime("%d/%m/%Y %H:%M:%S")
-            # print("date and time =", dt_string)
             if CAPTCHA_MODE == 'PREMIUM':
                 try:
                     _thread.start_new_thread(captcha_builder_premium, (100, session.headers, 1))

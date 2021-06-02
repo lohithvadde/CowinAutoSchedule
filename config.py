@@ -3,19 +3,20 @@ DATE = (datetime.today() + timedelta(0)).strftime("%d-%m-%Y")  # timedelta(1) me
 
 LIMIT = 3  # otp retry limit
 SLEEP_TIME = 3.5  # Change this to 5 or more when doing by pin code
-CAPTCHA_MODE = 'EXTRAORDINARY'  # AUTO or MANUAL or PREMIUM or EXTRAORDINARY
+CAPTCHA_MODE = 'EXTRAORDINARY'  # AUTO or MANUAL
+RATE_LIMITER = 1
 
-DISTRICT_ID = 312  # Check Book keeping folder for district ids. If it's not there, enter state id in the GET_DISTRICT_IDS and run.
+DISTRICT_ID = 581  # Check Book keeping folder for district ids. If it's not there, enter state id in the GET_DISTRICT_IDS and run.
 PINCODES = [560001,560002,560003,560004]  # Put DISTRICT_ID = 0 when you enter pin codes. Don't use more than 4 pin codes
 
-REGISTERED_MOBILE_NUMBER = 6363640877  # 10 digit mobile number in int
+REGISTERED_MOBILE_NUMBER = 8328608324  # 10 digit mobile number in int
 BENEFICIARY_IDS = {
-    '18':["17543864481450"],
+    '18':["47973692865830","46302207661920"],
     '45':[""]
 }  # beneficiary ids in str format and comma separated ids
 AGE = 18
 DOSE = 1
-VACCINE = 'ANY'  # 'ANY' or 'COVISHIELD' or 'COVAXIN' or 'SPUTNIK'
+VACCINE = 'COVAXIN'  # 'ANY' or 'COVISHIELD' or 'COVAXIN' or 'SPUTNIK'
 
 headers = {
     'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.95 Safari/537.36',
