@@ -14,7 +14,7 @@ def retry(func):
             print("sending otp..........")
             txn=func()
             if txn:
-                is_otp_received = input("Press y/Y to continue if you received OTP.\nPress n/N to retry. Max Retry limit:3\n===>")
+                is_otp_received = input("Press y/Y to continue if you received OTP.\nPress n/N to retry. Max Retry limit:3\n========>")
                 if is_otp_received == 'y' or is_otp_received == 'Y':
                     return txn
                 elif is_otp_received == 'n' or is_otp_received == 'N':

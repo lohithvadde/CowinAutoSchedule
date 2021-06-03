@@ -115,10 +115,10 @@ def book_appointment_by_district(age: int, dose: int):
                                 print("date and time =", dt_string)
                                 return True
         else:
-            os.system(f'say -v "Victoria" "Session expired wait for 30 seconds"')
+            os.system(f'say -v "Victoria" "Session expired"')
             print(f"status code: {out.status_code}")
             print(f"response: {out.text}")
-            time.sleep(30)
+            time.sleep(SLEEP_TIME)
             out = get_authenticated_session()
             if out:
                 book_appointment_by_district(AGE, DOSE)
@@ -187,7 +187,7 @@ def book_appointment_by_pincodes(age: int, dose: int):
                 os.system(f'say -v "Victoria" "Session expired wait for 30 seconds"')
                 print(f"status code: {out.status_code}")
                 print(f"response: {out.text}")
-                time.sleep(30)
+                time.sleep(SLEEP_TIME)
                 out = get_authenticated_session()
                 if out:
                     book_appointment_by_pincodes(AGE, DOSE)
@@ -216,27 +216,21 @@ if __name__ == '__main__':
     else:
         out = get_authenticated_session()
         if out:
-            # now = datetime.now()
-            # dt_string = now.strftime("%d/%m/%Y %H:%M:%S")
-            # print("date and time =", dt_string)
-            # get_captcha() #For testing captcha
-            # now = datetime.now()
-            # dt_string = now.strftime("%d/%m/%Y %H:%M:%S")
-            # print("date and time =", dt_string)
             if CAPTCHA_MODE == 'PREMIUM':
                 try:
                     _thread.start_new_thread(captcha_builder_premium, (100, session.headers, 1))
                 except:
                     print("Error: unable to start thread")
-
-            if DISTRICT_ID:
-                book_appointment_by_district(AGE, DOSE)
-            elif PINCODES:
-                book_appointment_by_pincodes(AGE, DOSE)
-            else:
-                os.system(f'say -v "Victoria" "Please enter district id or pin codes"')
-                print("Please enter district id or pin codes")
-                exit(1)
+            start_search = input("Press y/Y to continue if you want to start searching\n========>")
+            if start_search == 'y' or start_search == 'Y':
+                if DISTRICT_ID:
+                    book_appointment_by_district(AGE, DOSE)
+                elif PINCODES:
+                    book_appointment_by_pincodes(AGE, DOSE)
+                else:
+                    os.system(f'say -v "Victoria" "Please enter district id or pin codes"')
+                    print("Please enter district id or pin codes")
+                    exit(1)
         else:
             os.system(f'say -v "Victoria" "Failed to login"')
             print("Failed to login")
