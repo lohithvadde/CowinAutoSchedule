@@ -25,7 +25,7 @@ def retry(func):
 
 @retry
 def generateOTP():
-    data = {"secret":"U2FsdGVkX1+z/4Nr9nta+2DrVJSv7KS6VoQUSQ1ZXYDx/CJUkWxFYG6P3iM/VW+6jLQ9RDQVzp/RcZ8kbT41xw==","mobile": REGISTERED_MOBILE_NUMBER}
+    data = {"secret":"U2FsdGVkX196RKSOE31ozbO/QRHGJ6RuEqacJuqWO4NQaA+7SO/1Ixzhqe/fkMtk4HjsB7Bjy1GKdC7qGOHeBg==","mobile": REGISTERED_MOBILE_NUMBER}
     resp = session.post('https://cdn-api.co-vin.in/api/v2/auth/generateMobileOTP', data=json.dumps(data))
     if resp.status_code == 200:
         os.system(f'say -v "Victoria" "Enter OTP"')
@@ -52,8 +52,7 @@ def validateOTP(txnId=None):
     else:
         print(f"Validate otp Status code: {resp.status_code}\n{resp.text}")
         return False# sys.exit('Terminated')
-
-
+    
 def get_authenticated_session():
     # session = requests.Session()
     txn = generateOTP()
