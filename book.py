@@ -6,6 +6,8 @@ from login import *
 from datetime import datetime
 from captcha import captcha_builder_manual, captcha_builder_auto, captcha_builder_premium, captcha_builder_extraordinary
 
+refresh_count = 0
+
 
 def get_districts(state_id: int):
     url = f"https://cdn-api.co-vin.in/api/v2/admin/location/districts/{state_id}"
@@ -28,11 +30,12 @@ def get_beneficiaries():
 
 def book_slot(book):
     print(f"Trying to book: {book}")
-    captcha_result = get_captcha()
-    if captcha_result == 'None' or len(captcha_result) < 5:
-        print(f"Trying captcha again")
-        captcha_result = get_captcha()  # sometimes we don't get captcha in the first attempt or the captcha has just 4 letters
-    book["captcha"] = captcha_result
+    if CAPTCHA_MODE != 'NOCAPTCHA':
+        captcha_result = get_captcha()
+        if captcha_result == 'None' or len(captcha_result) < 5:
+            print(f"Trying captcha again")
+            captcha_result = get_captcha()  # sometimes we don't get captcha in the first attempt or the captcha has just 4 letters
+        book["captcha"] = captcha_result
     book = json.dumps(book)
     resp = session.post("https://cdn-api.co-vin.in/api/v2/appointment/schedule", data=book)
     if resp.status_code == 200:
@@ -70,6 +73,20 @@ def get_captcha():
 
 
 def book_appointment_by_district(age: int, dose: int):
+    global refresh_count
+    refresh_count += 1
+    print(refresh_count)
+
+    if refresh_count == 20:
+        refresh_count = 0
+        out = get_authenticated_session()
+        if out:
+            book_appointment_by_district(AGE, DOSE)
+        else:
+            os.system(f'say -v "Victoria" "Failed to login"')
+            print("Failed to login")
+            return False
+
     now = datetime.now()
     dt_string = now.strftime("%d/%m/%Y %H:%M:%S")
     print("date and time =", dt_string)
@@ -124,6 +141,20 @@ def book_appointment_by_district(age: int, dose: int):
 
 
 def book_appointment_by_pincodes(age: int, dose: int):
+    global refresh_count
+    refresh_count += 1
+    print(refresh_count)
+
+    if refresh_count == 20:
+        refresh_count = 0
+        out = get_authenticated_session()
+        if out:
+            book_appointment_by_district(AGE, DOSE)
+        else:
+            os.system(f'say -v "Victoria" "Failed to login"')
+            print("Failed to login")
+            return False
+
     now = datetime.now()
     dt_string = now.strftime("%d/%m/%Y %H:%M:%S")
     print("date and time =", dt_string)
