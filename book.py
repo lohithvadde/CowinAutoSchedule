@@ -6,7 +6,7 @@ from login import *
 from datetime import datetime
 from captcha import captcha_builder_manual, captcha_builder_auto, captcha_builder_premium, captcha_builder_extraordinary
 
-refresh_count = 0   
+global DATE
 
 
 def get_districts(state_id: int):
@@ -191,16 +191,21 @@ if __name__ == '__main__':
                     _thread.start_new_thread(captcha_builder_premium, (100, session.headers, 1))
                 except:
                     print("Error: unable to start thread")
-            start_search = input("Press y/Y to continue if you want to start searching\n========>")
-            if start_search == 'y' or start_search == 'Y':
-                if DISTRICT_ID:
-                    find_appointment_by_district(AGE, DOSE)
-                elif PINCODES:
-                    find_appointment_by_pincodes(AGE, DOSE)
-                else:
-                    os.system(f'say -v "Victoria" "Please enter district id or pin codes"')
-                    print("Please enter district id or pin codes")
-                    exit(1)
+            global DATE
+            delta = input("Enter delta 0 for today or 1 for tmrw or 2 for day after.... Default is 1 if you don't enter anything")
+            if delta == '0' or delta == '2':
+                DATE = (datetime.today() + timedelta(int(delta))).strftime("%d-%m-%Y")
+            else:
+                DATE = (datetime.today() + timedelta(1)).strftime("%d-%m-%Y")
+
+            if DISTRICT_ID:
+                find_appointment_by_district(AGE, DOSE)
+            elif PINCODES:
+                find_appointment_by_pincodes(AGE, DOSE)
+            else:
+                os.system(f'say -v "Victoria" "Please enter district id or pin codes"')
+                print("Please enter district id or pin codes")
+                exit(1)
         else:
             os.system(f'say -v "Victoria" "Failed to login"')
             print("Failed to login")
