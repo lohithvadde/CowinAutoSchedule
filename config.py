@@ -1,5 +1,4 @@
 from datetime import timedelta, datetime
-#DATE = (datetime.today() + timedelta(1)).strftime("%d-%m-%Y")  # timedelta(1) means any dates from tomorrow.
 
 LIMIT = 3  # otp retry limit
 SLEEP_TIME = 3.5  # Change this to 5 or more when doing by pin code

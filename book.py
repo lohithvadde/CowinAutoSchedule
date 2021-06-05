@@ -192,7 +192,7 @@ if __name__ == '__main__':
                 except:
                     print("Error: unable to start thread")
             global DATE
-            delta = input("Enter delta 0 for today or 1 for tmrw or 2 for day after.... Default is 1 if you don't enter anything")
+            delta = input("Enter delta 0 for today or 1 for tmrw or 2 for day after.... Default is 1 if you don't enter anything ====>")
             if delta == '0' or delta == '2':
                 DATE = (datetime.today() + timedelta(int(delta))).strftime("%d-%m-%Y")
             else:
