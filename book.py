@@ -6,7 +6,7 @@ from login import *
 from datetime import datetime
 from captcha import captcha_builder_manual, captcha_builder_auto, captcha_builder_premium, captcha_builder_extraordinary
 
-refresh_count = 0
+refresh_count = 0   
 
 
 def get_districts(state_id: int):
@@ -72,35 +72,74 @@ def get_captcha():
             return 'None'
 
 
-def book_appointment_by_district(age: int, dose: int):
-    global refresh_count
-    refresh_count += 1
-    print(refresh_count)
-
-    if refresh_count == 20:
-        refresh_count = 0
+def find_appointment_by_district(age: int, dose: int):
+    now = datetime.now()
+    dt_string = now.strftime("%d/%m/%Y %H:%M:%S")
+    print("date and time =", dt_string)
+    try:
+        out = session.get(f"https://cdn-api.co-vin.in/api/v2/appointment/sessions/findByDistrict?district_id={DISTRICT_ID}&date={DATE}")
+        if out.status_code == 200:
+            for sessions in out.json()['sessions']:
+                if sessions['available_capacity'] > len(BENEFICIARY_IDS[f"{age}"]) and sessions['min_age_limit'] == age:
+                    if (DOSE == 1 and sessions['available_capacity_dose1'] > len(BENEFICIARY_IDS[f"{age}"]) and (VACCINE == 'ANY' or VACCINE == sessions['vaccine'])) or \
+                            (DOSE == 2 and sessions['available_capacity_dose2'] > len(BENEFICIARY_IDS[f"{age}"]) and VACCINE == sessions['vaccine']):
+                        print(f"\ncenter name: {sessions['name']} capacity: {sessions['available_capacity']} slots: {sessions['slots']}")
+                        book = {
+                            "center_id": sessions['center_id'],
+                            "session_id": sessions['session_id'],
+                            "beneficiaries": BENEFICIARY_IDS[f"{age}"],
+                            "slot": sessions['slots'][0],
+                            "dose": dose
+                        }
+                        stop = book_slot(book)
+                        if stop:
+                            os.system(f'say -v "Victoria" "Booking Successful"')
+                            print("Booking Successful")
+                            now = datetime.now()
+                            dt_string = now.strftime("%d/%m/%Y %H:%M:%S")
+                            print("date and time =", dt_string)
+                            return True
+        else:
+            os.system(f'say -v "Victoria" "Session expired"')
+            print(f"status code: {out.status_code}")
+            print(f"response: {out.text}")
+            time.sleep(SLEEP_TIME)
+            out = get_authenticated_session()
+            if out:
+                find_appointment_by_district(AGE, DOSE)
+            else:
+                os.system(f'say -v "Victoria" "Failed to login"')
+                print("Failed to login")
+                return False
+        time.sleep(SLEEP_TIME)
+        find_appointment_by_district(AGE, DOSE)
+    except (requests.exceptions.SSLError, requests.exceptions.ConnectionError, requests.exceptions.ReadTimeout) as e:
+        print(type(e), '::', e)
+        time.sleep(SLEEP_TIME)
         out = get_authenticated_session()
         if out:
-            book_appointment_by_district(AGE, DOSE)
+            find_appointment_by_district(AGE, DOSE)
         else:
             os.system(f'say -v "Victoria" "Failed to login"')
             print("Failed to login")
             return False
 
+
+def find_appointment_by_pincodes(age: int, dose: int):
     now = datetime.now()
     dt_string = now.strftime("%d/%m/%Y %H:%M:%S")
     print("date and time =", dt_string)
     try:
-        out = session.get(f"https://cdn-api.co-vin.in/api/v2/appointment/sessions/calendarByDistrict?district_id={DISTRICT_ID}&date={DATE}")
-        if out.status_code == 200:
-            for j in out.json()['centers']:
-                for sessions in j['sessions']:
+        for i in PINCODES:
+            out = session.get(f"https://cdn-api.co-vin.in/api/v2/appointment/sessions/findByPin?pincode={i}&date={DATE}")
+            if out.status_code == 200:
+                for sessions in out.json()['sessions']:
                     if sessions['available_capacity'] > len(BENEFICIARY_IDS[f"{age}"]) and sessions['min_age_limit'] == age:
                         if (DOSE == 1 and sessions['available_capacity_dose1'] > len(BENEFICIARY_IDS[f"{age}"]) and (VACCINE == 'ANY' or VACCINE == sessions['vaccine'])) or \
                                 (DOSE == 2 and sessions['available_capacity_dose2'] > len(BENEFICIARY_IDS[f"{age}"]) and VACCINE == sessions['vaccine']):
-                            print(f"\ncenter name: {j['name']} capacity: {sessions['available_capacity']} slots: {sessions['slots']}")
+                            print(f"\ncenter name: {sessions['name']} capacity: {sessions['available_capacity']} slots: {sessions['slots']}")
                             book = {
-                                "center_id": j['center_id'],
+                                "center_id": sessions['center_id'],
                                 "session_id": sessions['session_id'],
                                 "beneficiaries": BENEFICIARY_IDS[f"{age}"],
                                 "slot": sessions['slots'][0],
@@ -114,75 +153,6 @@ def book_appointment_by_district(age: int, dose: int):
                                 dt_string = now.strftime("%d/%m/%Y %H:%M:%S")
                                 print("date and time =", dt_string)
                                 return True
-        else:
-            os.system(f'say -v "Victoria" "Session expired"')
-            print(f"status code: {out.status_code}")
-            print(f"response: {out.text}")
-            time.sleep(SLEEP_TIME)
-            out = get_authenticated_session()
-            if out:
-                book_appointment_by_district(AGE, DOSE)
-            else:
-                os.system(f'say -v "Victoria" "Failed to login"')
-                print("Failed to login")
-                return False
-        time.sleep(SLEEP_TIME)
-        book_appointment_by_district(AGE, DOSE)
-    except (requests.exceptions.SSLError, requests.exceptions.ConnectionError, requests.exceptions.ReadTimeout) as e:
-        print(type(e), '::', e)
-        time.sleep(SLEEP_TIME)
-        out = get_authenticated_session()
-        if out:
-            book_appointment_by_district(AGE, DOSE)
-        else:
-            os.system(f'say -v "Victoria" "Failed to login"')
-            print("Failed to login")
-            return False
-
-
-def book_appointment_by_pincodes(age: int, dose: int):
-    global refresh_count
-    refresh_count += 1
-    print(refresh_count)
-
-    if refresh_count == 20:
-        refresh_count = 0
-        out = get_authenticated_session()
-        if out:
-            book_appointment_by_district(AGE, DOSE)
-        else:
-            os.system(f'say -v "Victoria" "Failed to login"')
-            print("Failed to login")
-            return False
-
-    now = datetime.now()
-    dt_string = now.strftime("%d/%m/%Y %H:%M:%S")
-    print("date and time =", dt_string)
-    try:
-        for i in PINCODES:
-            out = session.get(f"https://cdn-api.co-vin.in/api/v2/appointment/sessions/calendarByPin?pincode={i}&date={DATE}")
-            if out.status_code == 200:
-                for j in out.json()['centers']:
-                    for sessions in j['sessions']:
-                        if sessions['available_capacity'] > len(BENEFICIARY_IDS[f"{age}"]) and sessions['min_age_limit'] == age:
-                            if (DOSE == 1 and sessions['available_capacity_dose1'] > len(BENEFICIARY_IDS[f"{age}"]) and (VACCINE == 'ANY' or VACCINE == sessions['vaccine'])) or \
-                                    (DOSE == 2 and sessions['available_capacity_dose2'] > len(BENEFICIARY_IDS[f"{age}"]) and VACCINE == sessions['vaccine']):
-                                print(f"\ncenter name: {j['name']} capacity: {sessions['available_capacity']} slots: {sessions['slots']}")
-                                book = {
-                                    "center_id": j['center_id'],
-                                    "session_id": sessions['session_id'],
-                                    "beneficiaries": BENEFICIARY_IDS[f"{age}"],
-                                    "slot": sessions['slots'][0],
-                                    "dose": dose
-                                }
-                                stop = book_slot(book)
-                                if stop:
-                                    os.system(f'say -v "Victoria" "Booking Successful"')
-                                    print("Booking Successful")
-                                    now = datetime.now()
-                                    dt_string = now.strftime("%d/%m/%Y %H:%M:%S")
-                                    print("date and time =", dt_string)
-                                    return True
             else:
                 os.system(f'say -v "Victoria" "Session expired wait for 30 seconds"')
                 print(f"status code: {out.status_code}")
@@ -190,19 +160,19 @@ def book_appointment_by_pincodes(age: int, dose: int):
                 time.sleep(SLEEP_TIME)
                 out = get_authenticated_session()
                 if out:
-                    book_appointment_by_pincodes(AGE, DOSE)
+                    find_appointment_by_pincodes(AGE, DOSE)
                 else:
                     os.system(f'say -v "Victoria" "Failed to login"')
                     print("Failed to login")
                     return False
         time.sleep(SLEEP_TIME)
-        book_appointment_by_pincodes(AGE, DOSE)
+        find_appointment_by_pincodes(AGE, DOSE)
     except (requests.exceptions.SSLError, requests.exceptions.ConnectionError, requests.exceptions.ReadTimeout) as e:
         print(type(e), '::', e)
         time.sleep(SLEEP_TIME)
         out = get_authenticated_session()
         if out:
-            book_appointment_by_pincodes(AGE, DOSE)
+            find_appointment_by_pincodes(AGE, DOSE)
         else:
             os.system(f'say -v "Victoria" "Failed to login"')
             print("Failed to login")
@@ -224,9 +194,9 @@ if __name__ == '__main__':
             start_search = input("Press y/Y to continue if you want to start searching\n========>")
             if start_search == 'y' or start_search == 'Y':
                 if DISTRICT_ID:
-                    book_appointment_by_district(AGE, DOSE)
+                    find_appointment_by_district(AGE, DOSE)
                 elif PINCODES:
-                    book_appointment_by_pincodes(AGE, DOSE)
+                    find_appointment_by_pincodes(AGE, DOSE)
                 else:
                     os.system(f'say -v "Victoria" "Please enter district id or pin codes"')
                     print("Please enter district id or pin codes")
