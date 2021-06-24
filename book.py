@@ -80,7 +80,7 @@ def find_appointment_by_district(age: int, dose: int):
         out = session.get(f"https://cdn-api.co-vin.in/api/v2/appointment/sessions/findByDistrict?district_id={DISTRICT_ID}&date={DATE}")
         if out.status_code == 200:
             for sessions in out.json()['sessions']:
-                if sessions['available_capacity'] > len(BENEFICIARY_IDS[f"{age}"]) and sessions['min_age_limit'] == age:
+                if sessions['available_capacity'] > len(BENEFICIARY_IDS[f"{age}"]) and sessions['min_age_limit'] == age and (sessions['fee_type'] == FEE_TYPE or FEE_TYPE == 'Any'):
                     if (DOSE == 1 and sessions['available_capacity_dose1'] > len(BENEFICIARY_IDS[f"{age}"]) and (VACCINE == 'ANY' or VACCINE == sessions['vaccine'])) or \
                             (DOSE == 2 and sessions['available_capacity_dose2'] > len(BENEFICIARY_IDS[f"{age}"]) and VACCINE == sessions['vaccine']):
                         print(f"\ncenter name: {sessions['name']} capacity: {sessions['available_capacity']} slots: {sessions['slots']}")
@@ -134,7 +134,7 @@ def find_appointment_by_pincodes(age: int, dose: int):
             out = session.get(f"https://cdn-api.co-vin.in/api/v2/appointment/sessions/findByPin?pincode={i}&date={DATE}")
             if out.status_code == 200:
                 for sessions in out.json()['sessions']:
-                    if sessions['available_capacity'] > len(BENEFICIARY_IDS[f"{age}"]) and sessions['min_age_limit'] == age:
+                    if sessions['available_capacity'] > len(BENEFICIARY_IDS[f"{age}"]) and sessions['min_age_limit'] == age and (sessions['fee_type'] == FEE_TYPE or FEE_TYPE == 'Any'):
                         if (DOSE == 1 and sessions['available_capacity_dose1'] > len(BENEFICIARY_IDS[f"{age}"]) and (VACCINE == 'ANY' or VACCINE == sessions['vaccine'])) or \
                                 (DOSE == 2 and sessions['available_capacity_dose2'] > len(BENEFICIARY_IDS[f"{age}"]) and VACCINE == sessions['vaccine']):
                             print(f"\ncenter name: {sessions['name']} capacity: {sessions['available_capacity']} slots: {sessions['slots']}")

@@ -4,17 +4,18 @@ LIMIT = 3  # otp retry limit
 SLEEP_TIME = 3.5  # Change this to 5 or more when doing by pin code
 CAPTCHA_MODE = 'NOCAPTCHA'  # AUTO or MANUAL or PREMIUM or EXTRAORDINARY or NOCAPTCHA
 
-DISTRICT_ID = 395  # Check Book keeping folder for district ids. If it's not there, enter state id in the GET_DISTRICT_IDS and run.
-PINCODES = [400002]  # Put DISTRICT_ID = 0 when you enter pin codes. Don't use more than 4 pin codes
+DISTRICT_ID = 581  # Check Book keeping folder for district ids. If it's not there, enter state id in the GET_DISTRICT_IDS and run.
+PINCODES = [416416]  # Put DISTRICT_ID = 0 when you enter pin codes. Don't use more than 4 pin codes
 
 REGISTERED_MOBILE_NUMBER = 6363640877  # 10 digit mobile number in int
 BENEFICIARY_IDS = {
-    '18':["93433417992070","12709797522520"],
+    '18':["53717251866020","88769679722410"],
     '45':[""]
 }  # beneficiary ids in str format and comma separated ids
 AGE = 18
-DOSE = 1
+DOSE = 2
 VACCINE = 'COVAXIN'  # 'ANY' or 'COVISHIELD' or 'COVAXIN' or 'SPUTNIK'
+FEE_TYPE = 'Any'  # 'Paid' or 'Free' or 'Any'
 
 headers = {
     'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.95 Safari/537.36',
